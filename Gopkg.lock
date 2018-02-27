@@ -26,6 +26,12 @@
   version = "v1.6.1"
 
 [[projects]]
+  name = "github.com/gorilla/schema"
+  packages = ["."]
+  revision = "4b90b4ceabc38b8ab7deae410e602c766a222c93"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/kelseyhightower/envconfig"
   packages = ["."]
   revision = "f611eb38b3875cc3bd991ca91c51d06446afa14c"
@@ -46,6 +52,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4e6b15f5cf768cc33129ff3ceec3127b03f9ec45733e94dbd1da1e1d2056202f"
+  inputs-digest = "d92c720b56968777771d3869aac1643c7e8ec72f24a585f5521472996cd5cbff"
   solver-name = "gps-cdcl"
   solver-version = 1

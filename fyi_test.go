@@ -16,21 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type OutgoingWebhookPayload struct {
-	Token       string `json:"token"`
-	TeamId      string `json:"team_id"`
-	TeamDomain  string `json:"team_domain"`
-	ChannelId   string `json:"channel_id"`
-	ChannelName string `json:"channel_name"`
-	Timestamp   int64  `json:"timestamp"`
-	UserId      string `json:"user_id"`
-	UserName    string `json:"user_name"`
-	PostId      string `json:"post_id"`
-	Text        string `json:"text"`
-	TriggerWord string `json:"trigger_word"`
-	FileIds     string `json:"file_ids"`
-}
-
 func Router() *mux.Router {
 	var config Config
 	err := envconfig.Process("fyi", &config)

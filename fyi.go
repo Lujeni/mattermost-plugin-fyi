@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -26,6 +27,21 @@ type Config struct {
 	GrafanaAPIKey string   `envconfig:"grafana_api_key"`
 	Username      string   `default:"ForYourInformation"`
 	IconURL       string   `default:"https://avatars2.githubusercontent.com/u/757902?s=460&v=4"`
+}
+
+type OutgoingWebhookPayload struct {
+	Token       string `json:"token"`
+	TeamId      string `json:"team_id"`
+	TeamDomain  string `json:"team_domain"`
+	ChannelId   string `json:"channel_id"`
+	ChannelName string `json:"channel_name"`
+	Timestamp   int64  `json:"timestamp"`
+	UserId      string `json:"user_id"`
+	UserName    string `json:"user_name"`
+	PostId      string `json:"post_id"`
+	Text        string `json:"text"`
+	TriggerWord string `json:"trigger_word"`
+	FileIds     string `json:"file_ids"`
 }
 
 type CommandResponse struct {
@@ -93,14 +109,24 @@ func ProcessCommand(r *http.Request, response *CommandResponse, config Config) s
 		return msg
 	}
 
-	if config.Token != "" && config.Token != r.FormValue("token") {
-		msg := fmt.Sprintf("Bad token received :: %v", r.FormValue("token"))
+	payload := new(OutgoingWebhookPayload)
+	decoder := schema.NewDecoder()
+	err := decoder.Decode(payload, r.PostForm)
+
+	if err != nil {
+		msg := fmt.Sprintf("Unable to decode struct :: %v", err.Error())
 		log.Printf(msg)
 		return msg
 	}
-	text := strings.Fields(r.FormValue("text"))
-	ExtractDate(r.FormValue("text"))
-	tagsAnnotation := []string{"fyi", r.FormValue("user_name")}
+
+	if config.Token != "" && config.Token != payload.Token {
+		msg := fmt.Sprintf("Bad token received :: %v", payload.Token)
+		log.Printf(msg)
+		return msg
+	}
+	text := strings.Fields(payload.Text)
+	ExtractDate(payload.Text)
+	tagsAnnotation := []string{"fyi", payload.UserName}
 	textAnnotation := []string{}
 
 	for _, field := range text {
