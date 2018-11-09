@@ -22,7 +22,7 @@ clean:
 	fi
 
 run:
-	$(GOBUILD) -o $(BINARY_NAME) -v ${BINARY_NAME}.go
+	$(GOBUILD) -o $(BINARY_NAME) -v
 	./$(BINARY_NAME)
 
 deps:
