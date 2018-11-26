@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -54,6 +56,7 @@ type CommandResponse struct {
 type GrafanaAnnotation struct {
 	Text string   `json:"text"`
 	Tags []string `json:"tags"`
+	Time string   `json:"time"`
 }
 
 type GrafanaAnnotationResponse struct {
@@ -97,7 +100,7 @@ func SendGrafanaAnnotation(config Config, annotation GrafanaAnnotation) (string,
 }
 
 func ExtractDate(text string) []string {
-	r := regexp.MustCompile(`(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01]\?-{1,2})`)
+	r := regexp.MustCompile(`(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}){1,2}`)
 	return r.FindAllString(text, 2)
 }
 
@@ -125,7 +128,17 @@ func ProcessCommand(r *http.Request, response *CommandResponse, config Config) s
 		return msg
 	}
 	text := strings.Fields(payload.Text)
-	ExtractDate(payload.Text)
+	dates := ExtractDate(payload.Text)
+	if len(dates) > 0 {
+		layout := "2006-01-01 01:00:00"
+		t, err := time.Parse(layout, dates[0])
+		if err != nil {
+			msg := fmt.Sprintf("Unable to parse time :: %v", dates[0])
+			log.Printf(msg)
+			return msg
+		}
+		fmt.Printf("OK %v", t)
+	}
 	tagsAnnotation := []string{"fyi", payload.UserName}
 	textAnnotation := []string{}
 
@@ -154,6 +167,24 @@ func ProcessCommand(r *http.Request, response *CommandResponse, config Config) s
 		return err.Error()
 	}
 	return msg
+}
+
+// HandleHealthz is usefull for Liveness and Readiness Probes
+func HandleHealthz(w http.ResponseWriter, r *http.Request, config Config) {
+	// check grafana connectivity
+	_, errGrafana := net.Dial("tcp", fmt.Sprintf("%v:80", config.GrafanaHost))
+	if errGrafana != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf("500 - %v", errGrafana)))
+	}
+
+	// check local endpoint
+	_, err := net.Dial("tcp", fmt.Sprintf("%v:%v", config.Host, config.Port))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf("500 - local API - %v", err)))
+	}
+	return
 }
 
 func HandleIndex(w http.ResponseWriter, r *http.Request, config Config) {
@@ -185,8 +216,14 @@ func main() {
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		HandleIndex(w, r, config)
 	}).Methods("GET", "POST")
+	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		HandleHealthz(w, r, config)
+	}).Methods("GET")
 
-	log.Printf("ListenAndServe - %v\n", address)
+	log.Printf("ListenAndServe")
+	log.Printf("|__Address ::	%v\n", address)
+	log.Printf("|__Grafana :: %v\n", config.GrafanaHost)
+	log.Printf("|__Tags :: %v\n", config.Tags)
 	loggerHandler := handlers.LoggingHandler(os.Stdout, r)
 	log.Fatal(http.ListenAndServe(address, loggerHandler))
 }
