@@ -10,7 +10,7 @@ Mattermost slash command to create Grafana annotations.
 # Follow this steps: https://docs.mattermost.com/developer/slash-commands.html
 
 # Pull
-$ docker pull lujeni/fyi
+$ docker build . -t lujeni/fyi
 
 # Run !
 $ docker run -e FYI_GRAFANA_HOST=https://grafana.com -e FYI_GRAFANA_API_KEY=eyJrIjoibXppaTB5NXVu --rm -it lujeni/fyi
@@ -18,7 +18,7 @@ $ docker run -e FYI_GRAFANA_HOST=https://grafana.com -e FYI_GRAFANA_API_KEY=eyJr
 
 #### Kubernetes
 ```
-$ kubectl apply -f kubernetes.yaml
+$ kubectl apply -f kubernetes
 ```
 
 #### Manual
@@ -66,4 +66,3 @@ type Config struct {
 ```bash
 $ make test
 ```
-

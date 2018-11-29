@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  name: fyi
+  labels:
+    app: fyi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fyi
+  template:
+    metadata:
+      labels:
+        app: fyi
+    spec:
+      containers:
+      - name: fyi
+        image: lujenii/fyi
+        ports:
+        - containerPort: 8888
+        livenessProbe:
+           httpGet:
+             path: /healthz
+             port: 8080
+           initialDelaySeconds: 5
+           periodSeconds: 5
+        readinessProbe:
+           httpGet:
+             path: /healthz
+             port: 8080
+           initialDelaySeconds: 5
+           periodSeconds: 5
+        envFrom:
+        - configMapRef:
+            name: fyi
+        - secretRef:
+            name: fyi
