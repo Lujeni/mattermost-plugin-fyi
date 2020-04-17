@@ -14,9 +14,9 @@ const manifestStr = `
 {
   "id": "com.github.manland.mattermost-plugin-fyi",
   "name": "FYI",
-  "description": "Grafana Annotations plugin for Mattermost.",
-  "homepage_url": "https://github.com/Lujeni/fyi",
-  "support_url": "https://github.com/Lujeni/fyi",
+  "description": "Mattermost plugin to create Grafana annotation.",
+  "homepage_url": "https://github.com/Lujeni/mattermost-plugin-fyi",
+  "support_url": "https://github.com/Lujeni/mattermost-plugin-fyi",
   "icon_path": "assets/icon.svg",
   "version": "1.0.0",
   "min_server_version": "5.10.0",
