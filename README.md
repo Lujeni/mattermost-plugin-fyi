@@ -2,7 +2,6 @@
 Mattermost plugin to easily create Grafana annotations.
 
 ![mattermost](https://raw.githubusercontent.com/Lujeni/fyi/master/assets/mattermost.png)
-![annotation](https://raw.githubusercontent.com/Lujeni/fyi/master/assets/annotation.png)
 
 ## Installation
 In Mattermost 5.16 and later, the FYI plugin is included in the Plugin Marketplace which can be accessed from **Main Menu > Plugins Marketplace**. You can install the GitLab plugin and then configure it via the [Plugin Marketplace "Configure" button](#configuration).
