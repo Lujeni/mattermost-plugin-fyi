@@ -1,9 +1,0 @@
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: fyi
-data:
-  FYI_PORT: "8888"
-  FYI_TAGS: infra
-  FYI_GRAFANA_HOST: https://grafana.com
