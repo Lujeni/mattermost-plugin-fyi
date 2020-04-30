@@ -23,3 +23,12 @@ In Mattermost 5.13 and earlier, follow these steps:
 
 1. Go to **System Console > Plugins > FYI** and fill the form
 3. Go to **Plugins Marketplace > FYI > Configure > Enable Plugin** and click **Enable** to enable the FYI plugin.
+
+## Developping
+This plugin contains only a server portion (no web app).
+
+Use make to build distributions of the plugin that you can upload to a Mattermost server.
+
+```
+$ make
+```

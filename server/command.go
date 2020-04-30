@@ -35,7 +35,7 @@ func createAnnotation(configuration *configuration, text string, tags []string) 
 	return *result.Message
 }
 
-const commandHelp = `* |/fyi annotate [reason] [tags]| - Create Grafana annotations
+const commandHelp = `* |/fyi annotate "reason text" #tag1 #tag2 | - Create Grafana annotations
 * |/fyi settings| - Display the configurations
 `
 
@@ -86,7 +86,8 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 	switch action {
 	case "annotate":
 		if len(parameters) == 0 {
-			return p.getCommandResponse(args, "Please specify a reason."), nil
+			text := fmt.Sprintf("Please specify a reason.\n\n------\n_%v_ \n\n-----\n%v", args.Command, strings.Replace(commandHelp, "|", "`", -1))
+			return p.getCommandResponse(args, text), nil
 		}
 		tagsAnnotation := []string{"fyi"}
 		textAnnotation := []string{}
@@ -94,7 +95,7 @@ func (p *Plugin) ExecuteCommand(c *plugin.Context, args *model.CommandArgs) (*mo
 		for _, field := range parameters {
 			if len(field) > 1 && strings.Contains(field, "#") {
 				if !annotationTagIsAllow(field[1:], tagsConfiguration) {
-					text := fmt.Sprintf("Unknown tag **%v**, these tags are available \n - tags: _```%v```_", field, tagsConfiguration)
+					text := fmt.Sprintf("Unknown tag **%v**, these tags are available \n _```%v```_ \n\n -----\n_%v_ \n\n -----\n%v", field, tagsConfiguration, args.Command, strings.Replace(commandHelp, "|", "`", -1))
 					return p.getCommandResponse(args, text), nil
 				}
 				tagsAnnotation = append(tagsAnnotation, field[1:])
